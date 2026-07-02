@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tg Userbot API Documentation</title>
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 0; background: #0e1117; color: #d7dae0; }
+    .container { max-width: 960px; margin: auto; padding: 32px; }
+    h1, h2, h3, h4 { color: #f0f6fc; }
+    p, li, code, pre { line-height: 1.6; }
+    a { color: #58a6ff; }
+    .box { border: 1px solid #30363d; padding: 20px; border-radius: 16px; background: rgba(255,255,255,0.03); margin-bottom: 24px; }
+    pre { background: #151b22; color: #c9d1d9; padding: 16px; border-radius: 12px; overflow-x: auto; }
+    code { background: rgba(139, 148, 159, 0.12); padding: 2px 6px; border-radius: 6px; color: #c9d1d9; }
+    ul { margin: 0 0 16px 20px; }
+    .badge { display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 6px 10px; border-radius: 12px; background: #161b22; border: 1px solid #30363d; margin-right: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>tg Userbot API Documentation</h1>
+      <p>Complete A-Z documentation for the Python/Flask/Pyrogram userbot API.</p>
+    </header>
+
+    <section class="box">
+      <h2>Overview</h2>
+      <p>This repository exposes a Telegram userbot-style API using <strong>Flask</strong> and <strong>Pyrogram</strong>. The API supports session persistence, reconnect handling, chat joins, message fetch, media download, and media streaming.</p>
+      <p>Everything runs from <code>app.py</code>, with command routing defined in <code>commands.py</code>.</p>
+    </section>
+
+    <section class="box">
+      <h2>Repository Structure</h2>
+      <ul>
+        <li><code>app.py</code> — main Flask API service and Pyrogram client management</li>
+        <li><code>commands.py</code> — simple command router for <code>/ping</code>, <code>/help</code>, and <code>/me</code></li>
+        <li><code>requirements.txt</code> — Python dependencies</li>
+        <li><code>tests/test_app.py</code> — API endpoint and helper tests</li>
+        <li><code>sessions/</code> — persistent Pyrogram session files</li>
+        <li><code>docs.html</code> — this documentation page</li>
+      </ul>
+    </section>
+
+    <section class="box">
+      <h2>Setup</h2>
+      <p>Follow these steps to get the project running:</p>
+      <ol>
+        <li>Create a virtual environment:</li>
+      </ol>
+      <pre><code>python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt</code></pre>
+      <p>Create a <code>.env</code> file in the project root with the following variables:</p>
+      <pre><code>TG_API_ID=123456
+TG_API_HASH=your_api_hash_here
+SESSION_STRING=your_session_string_here
+TG_SESSION_NAME=tg_userbot
+TG_DEVICE_MODEL=TG-API
+TG_APP_VERSION=1.0.0
+PORT=8991</code></pre>
+      <p><strong>Note:</strong> <code>SESSION_STRING</code> is optional but recommended. If missing, session files are stored automatically under <code>sessions/</code>.</p>
+    </section>
+
+    <section class="box">
+      <h2>Run the App</h2>
+      <pre><code>python3 app.py</code></pre>
+      <p>The service listens on port <code>8991</code> by default. You can change this with <code>PORT</code> in <code>.env</code>.</p>
+    </section>
+
+    <section class="box">
+      <h2>Available Endpoints</h2>
+      <p>These are the exposed API routes in the current implementation:</p>
+      <ul>
+        <li><code>GET /health</code> — check service status</li>
+        <li><code>GET /api/join/&lt;username|id|link&gt;</code> — join a Telegram chat or channel</li>
+        <li><code>GET /api/&lt;username|id&gt;/&lt;message_id&gt;</code> — fetch a message by chat identifier and message ID</li>
+        <li><code>GET /api/v2/&lt;chat_id&gt;/&lt;message_id&gt;</code> — legacy-style message fetch by numeric chat ID</li>
+        <li><code>POST /api/send</code> — send a text message to a chat</li>
+        <li><code>POST /api/command</code> — execute bot commands</li>
+        <li><code>GET /api/download/&lt;username|id&gt;/&lt;message_id&gt;</code> — download message media to disk</li>
+        <li><code>GET /api/stream/&lt;username|id&gt;/&lt;message_id&gt;</code> — stream downloaded media directly over HTTP</li>
+      </ul>
+    </section>
+
+    <section class="box">
+      <h2>Endpoint Details</h2>
+      <h3>GET /health</h3>
+      <p>Returns a JSON payload with service status, readiness, and configuration state.</p>
+      <pre><code>{
+  "status": "ok",
+  "service": "tg-pyrogram-api",
+  "ready": true,
+  "configured": true,
+  "message": "Userbot is ready to connect when credentials are provided."
+}</code></pre>
+
+      <h3>GET /api/join/&lt;identifier&gt;</h3>
+      <p>Joins a chat or channel by username, numeric ID, or Telegram invite link.</p>
+      <pre><code>curl http://127.0.0.1:8991/api/join/@sageairdrops</code></pre>
+      <p>Response example:</p>
+      <pre><code>{
+  "ok": true,
+  "joined": true,
+  "identifier": "@sageairdrops",
+  "chat": "sageairdrops"
+}</code></pre>
+
+      <h3>GET /api/&lt;identifier&gt;/&lt;message_id&gt;</h3>
+      <p>Fetches a message from any chat identifier type, including username, link, or numeric ID.</p>
+      <pre><code>curl http://127.0.0.1:8991/api/sageairdrops/123</code></pre>
+
+      <h3>GET /api/v2/&lt;chat_id&gt;/&lt;message_id&gt;</h3>
+      <p>Fetches a message using a numeric chat ID path. This route preserves compatibility with earlier formats.</p>
+      <pre><code>curl http://127.0.0.1:8991/api/v2/-1001234567890/123</code></pre>
+
+      <h3>POST /api/send</h3>
+      <p>Sends text to a chat.</p>
+      <pre><code>curl -X POST http://127.0.0.1:8991/api/send \
+  -H "Content-Type: application/json" \
+  -d '{"chat_id":"@sageairdrops","text":"Hello from userbot"}'</code></pre>
+
+      <h3>POST /api/command</h3>
+      <p>Executes a supported bot-style command against the local router.</p>
+      <pre><code>curl -X POST http://127.0.0.1:8991/api/command \
+  -H "Content-Type: application/json" \
+  -d '{"text":"/ping"}'</code></pre>
+      <p>Built-in commands:</p>
+      <ul>
+        <li><code>/ping</code> — returns <code>pong</code></li>
+        <li><code>/help</code> — lists available commands</li>
+        <li><code>/me</code> — returns bot readiness and chat context</li>
+      </ul>
+      <p>Example response:</p>
+      <pre><code>{
+  "ok": true,
+  "handled": true,
+  "response": "pong"
+}</code></pre>
+
+      <h3>GET /api/download/&lt;identifier&gt;/&lt;message_id&gt;</h3>
+      <p>Downloads supported media from a message to the <code>downloads/</code> directory and returns the saved path.</p>
+      <pre><code>curl http://127.0.0.1:8991/api/download/@sageairdrops/123</code></pre>
+      <p>Example response:</p>
+      <pre><code>{
+  "ok": true,
+  "message_id": 123,
+  "chat_id": "-100...",
+  "file_path": "/workspaces/tg/downloads/123_photo.jpg",
+  "file_name": "123_photo.jpg"
+}</code></pre>
+
+      <h3>GET /api/stream/&lt;identifier&gt;/&lt;message_id&gt;</h3>
+      <p>Streams the downloaded media file directly over HTTP. This is useful for embedding or previewing media without manual file handling.</p>
+      <pre><code>curl http://127.0.0.1:8991/api/stream/@sageairdrops/123</code></pre>
+    </section>
+
+    <section class="box">
+      <h2>Session Persistence & Auto-Reconnect</h2>
+      <p>The service stores Pyrogram session data under <code>sessions/</code> when <code>SESSION_STRING</code> is not supplied. That means the login session remains persistent across restarts.</p>
+      <p>The app also uses a dedicated event loop thread for Pyrogram and automatically reconnects when an endpoint triggers <code>ensure_connected()</code>.</p>
+
+      <h3>When to use <code>SESSION_STRING</code></h3>
+      <ul>
+        <li>If you want headless startup without interactive login, provide a valid Telegram session string.</li>
+        <li>If you omit it, the app saves session files automatically under <code>sessions/</code>.</li>
+      </ul>
+    </section>
+
+    <section class="box">
+      <h2>Common Troubleshooting</h2>
+      <h3>Service says not configured</h3>
+      <p>Make sure <code>TG_API_ID</code> and <code>TG_API_HASH</code> are present in <code>.env</code> and properly loaded by the app.</p>
+
+      <h3>Loop mismatch error</h3>
+      <p>The implementation uses a dedicated Pyrogram event loop thread to avoid errors like <code>Future attached to a different loop</code>.</p>
+
+      <h3>File not found after download</h3>
+      <p>Make sure the message contains media and the service has permission to write to <code>downloads/</code>.</p>
+    </section>
+
+    <section class="box">
+      <h2>Testing</h2>
+      <p>Run the repository tests with:</p>
+      <pre><code>python3 -m unittest discover -s tests</code></pre>
+      <p>The test suite covers health checks, endpoint errors, command handling, and media route behavior.</p>
+    </section>
+
+    <section class="box">
+      <h2>Further Improvements</h2>
+      <ul>
+        <li>API authentication tokens for secure access</li>
+        <li>Webhook-based Telegram event handling</li>
+        <li>auto-cleanup of old downloaded media</li>
+        <li>expanded command router with plugin system</li>
+        <li>structured JSON error codes and validation</li>
+      </ul>
+    </section>
+
+    <footer>
+      <p>Generated documentation for the <code>tg</code> userbot API.</p>
+    </footer>
+  </div>
+</body>
+</html>
