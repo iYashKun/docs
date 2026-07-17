@@ -10,261 +10,251 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
-        :root {
-            --purple: #a855f7;
-            --purple-dark: #7e22ce;
-        }
-
-        * {
-            user-select: none;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(145deg, #0a0a0a, #1a0033);
+            background: linear-gradient(135deg, #0f0a1f, #1a0033, #0a0a0a);
             color: #e5e5e5;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        .logo-font {
-            font-family: 'Space Grotesk', sans-serif;
-        }
+        .logo-font { font-family: 'Space Grotesk', sans-serif; }
 
         .glass {
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-heavy {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(24px);
         }
 
         .song-row {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-
         .song-row:hover {
-            transform: translateX(8px);
-            background: rgba(168, 85, 247, 0.1) !important;
-            box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.2);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(168, 85, 247, 0.25);
         }
 
         .progress-bar {
-            height: 4px;
-            background: rgba(255,255,255,0.1);
+            height: 5px;
+            background: rgba(255,255,255,0.12);
             border-radius: 9999px;
-            overflow: hidden;
         }
-
         .progress {
             height: 100%;
-            background: linear-gradient(to right, #a855f7, #c084fc);
-            transition: width 0.1s linear;
+            background: linear-gradient(90deg, #a855f7, #c026d3, #db2777);
+            transition: width 0.1s ease;
         }
 
-        .search-input {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            border-color: #a855f7;
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
-            background: rgba(255,255,255,0.1);
-        }
-
-        .player-card {
-            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
-        }
-
-        .neon-text {
-            text-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+        .neon-glow {
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.7);
         }
     </style>
 </head>
-<body class="flex flex-col items-center">
-    <div class="player-container w-full max-w-2xl mx-auto px-4 py-6">
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-2xl mx-auto">
+
         <!-- Header -->
-        <header class="flex items-center justify-between mb-8">
-            <h1 class="logo-font text-4xl font-bold tracking-tighter text-white neon-text">wèpláy</h1>
+        <header class="flex items-center justify-between mb-10">
+            <h1 class="logo-font text-5xl font-bold tracking-tighter text-white neon-glow">wèpláy</h1>
             
-            <div class="flex-1 max-w-md mx-8">
+            <div class="flex-1 max-w-lg mx-8">
                 <form id="searchForm" class="relative">
-                    <div class="search-form glass rounded-3xl flex items-center px-5 py-2">
+                    <div class="glass rounded-3xl flex items-center px-6 py-2">
                         <input id="searchInput" 
-                               class="search-input flex-1 bg-transparent text-sm placeholder-gray-400 focus:outline-none px-4 py-3 rounded-3xl text-white"
-                               type="search" 
-                               placeholder="Search songs, artists, albums..." 
-                               autocomplete="off">
+                               class="flex-1 bg-transparent text-lg placeholder-gray-400 focus:outline-none py-4"
+                               type="text" 
+                               placeholder="What are you craving today?">
                         <button type="submit" 
-                                class="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 rounded-2xl flex items-center justify-center transition-all active:scale-95">
-                            <span class="iconify text-white text-xl" data-icon="mdi:magnify"></span>
+                                class="w-12 h-12 bg-gradient-to-br from-purple-500 via-violet-600 to-fuchsia-600 rounded-2xl flex items-center justify-center hover:scale-110 transition-transform">
+                            <span class="iconify text-2xl text-white" data-icon="mdi:magnify"></span>
                         </button>
                     </div>
                 </form>
             </div>
         </header>
 
-        <main class="flex-1">
-            <div id="results" class="space-y-2 min-h-[400px]"></div>
+        <main>
+            <div id="results" class="space-y-3"></div>
         </main>
 
-        <!-- Now Playing -->
-        <div id="player-card" class="glass player-card rounded-3xl p-6 mt-8">
-            <div class="flex gap-6">
-                <img id="current-song-image" 
-                     src="https://placehold.co/400x400/png?text=No+Image" 
-                     alt="Album Art"
-                     class="w-32 h-32 object-cover rounded-2xl shadow-2xl ring-1 ring-white/10">
+        <!-- Premium Player -->
+        <div id="player-card" class="glass-heavy rounded-3xl p-8 mt-12 shadow-2xl">
+            <div class="flex gap-8">
+                <div class="relative">
+                    <img id="current-song-image" 
+                         src="https://placehold.co/400x400/1a0033/ffffff?text=♪" 
+                         class="w-40 h-40 object-cover rounded-3xl shadow-2xl ring-4 ring-purple-500/20" alt="Cover">
+                    <div class="absolute -bottom-2 -right-2 bg-black/70 text-xs px-3 py-1 rounded-2xl backdrop-blur-md" id="duration-badge">0:00</div>
+                </div>
 
-                <div class="flex-1 min-w-0">
-                    <h2 id="current-song-title" class="text-xl font-semibold text-white truncate">Select a song</h2>
-                    <p id="current-song-artist" class="text-gray-400 text-sm mt-1 truncate"></p>
+                <div class="flex-1">
+                    <h2 id="current-song-title" class="text-2xl font-semibold text-white leading-tight">Select a track</h2>
+                    <p id="current-song-artist" class="text-purple-300 text-lg mt-1"></p>
+                    <p id="current-song-info" class="text-sm text-gray-400 mt-2"></p>
 
-                    <div class="mt-6">
+                    <div class="mt-8">
                         <div class="progress-bar">
                             <div id="progress" class="progress w-0"></div>
                         </div>
-                        <div class="flex justify-between text-xs text-gray-400 mt-2">
+                        <div class="flex justify-between text-xs mt-3 text-gray-400">
                             <span id="current-time">0:00</span>
-                            <span id="duration">0:00</span>
+                            <span id="total-duration">0:00</span>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-center gap-8 mt-6">
-                        <button id="prev-btn" class="text-gray-400 hover:text-white transition-colors">
-                            <span class="iconify text-3xl" data-icon="mdi:skip-previous"></span>
+                    <div class="flex items-center justify-center gap-10 mt-10">
+                        <button id="prev-btn" class="text-gray-400 hover:text-white transition-all hover:scale-110">
+                            <span class="iconify text-4xl" data-icon="mdi:skip-previous"></span>
                         </button>
+                        
                         <button id="play-pause-btn" 
-                                class="w-14 h-14 bg-white text-black rounded-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
-                            <span class="iconify text-4xl" data-icon="mdi:play"></span>
+                                class="w-16 h-16 bg-white text-black rounded-3xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl">
+                            <span class="iconify text-5xl" data-icon="mdi:play"></span>
                         </button>
-                        <button id="next-btn" class="text-gray-400 hover:text-white transition-colors">
-                            <span class="iconify text-3xl" data-icon="mdi:skip-next"></span>
+                        
+                        <button id="next-btn" class="text-gray-400 hover:text-white transition-all hover:scale-110">
+                            <span class="iconify text-4xl" data-icon="mdi:skip-next"></span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Extra Controls -->
-            <div class="flex justify-end gap-3 mt-6">
-                <button id="favorite-btn" class="p-3 hover:bg-white/10 rounded-2xl transition-all">
-                    <span class="iconify text-2xl" data-icon="mdi:heart-outline"></span>
+            <!-- Bottom Controls -->
+            <div class="flex justify-end gap-4 mt-8">
+                <button id="favorite-btn" class="p-4 hover:bg-white/10 rounded-2xl transition-all">
+                    <span class="iconify text-3xl" data-icon="mdi:heart-outline"></span>
                 </button>
-                <button id="share-btn" class="p-3 hover:bg-white/10 rounded-2xl transition-all">
-                    <span class="iconify text-2xl" data-icon="mdi:share-variant"></span>
+                <button id="share-btn" class="p-4 hover:bg-white/10 rounded-2xl transition-all">
+                    <span class="iconify text-3xl" data-icon="mdi:share-variant"></span>
                 </button>
             </div>
         </div>
     </div>
 
-    <audio id="audioPlayer" preload="none"></audio>
+    <audio id="audioPlayer" preload="metadata"></audio>
 
     <script>
-        const searchForm = document.getElementById('searchForm');
-        const searchInput = document.getElementById('searchInput');
-        const results = document.getElementById('results');
-        const audioPlayer = document.getElementById('audioPlayer');
+        // API Base (light obfuscation)
+        const API_BASE = atob('aHR0cHM6Ly9zYWF2bi5zdW1pdC5jby9hcGkv') + 'search/songs';
 
         let songs = [];
         let currentIndex = -1;
         let isPlaying = false;
 
-        // New API Mapping
         async function searchSongs(query) {
-            results.innerHTML = `
-                <div class="flex justify-center items-center h-64">
-                    <div class="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-20">
+                    <div class="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p class="text-gray-400 mt-6">Searching the cosmos...</p>
                 </div>`;
 
             try {
-                const res = await fetch(`https://saavn.sumit.co/api/search/songs?query=${encodeURIComponent(query)}`);
+                const res = await fetch(`${API_BASE}?query=${encodeURIComponent(query)}`);
                 const data = await res.json();
 
-                if (data.success && data.data?.results?.length > 0) {
+                if (data.success && data.data?.results?.length) {
                     songs = data.data.results.map(song => ({
                         id: song.id,
-                        name: song.name || 'Unknown',
-                        artist: song.artists?.primary?.[0]?.name || song.artists?.all?.[0]?.name || 'Unknown Artist',
-                        image: song.image?.find(img => img.quality === "500x500")?.url || 
-                               song.image?.[0]?.url || 
-                               'https://placehold.co/400x400/png?text=No+Image',
+                        name: song.name,
+                        artist: song.artists?.primary?.map(a => a.name).join(', ') || 'Unknown',
+                        image: song.image?.find(i => i.quality === "500x500")?.url || 
+                               song.image?.[0]?.url || '',
                         url: song.downloadUrl?.find(d => d.quality === "320kbps")?.url || 
-                             song.downloadUrl?.[song.downloadUrl.length - 1]?.url || ''
+                             song.downloadUrl?.[song.downloadUrl.length-1]?.url || '',
+                        duration: song.duration || 0,
+                        year: song.year,
+                        playCount: song.playCount
                     }));
-
                     renderSongs();
                 } else {
-                    results.innerHTML = `<div class="text-center py-20 text-gray-400">No results found for "<span class="text-purple-400">${query}</span>"</div>`;
-                    songs = [];
+                    resultsDiv.innerHTML = `<div class="text-center py-20 text-gray-400 text-xl">No matches found</div>`;
                 }
-            } catch (err) {
-                results.innerHTML = `<div class="text-center py-20 text-red-400">Failed to fetch songs. Try again.</div>`;
+            } catch (e) {
+                resultsDiv.innerHTML = `<div class="text-center py-20 text-red-400">Connection error. Try again.</div>`;
             }
         }
 
         function renderSongs() {
-            results.innerHTML = '';
+            const container = document.getElementById('results');
+            container.innerHTML = '';
+
             songs.forEach((song, i) => {
+                const min = Math.floor(song.duration / 60);
+                const sec = song.duration % 60;
+                const durationStr = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+
                 const row = document.createElement('div');
-                row.className = `song-row glass rounded-2xl p-4 flex items-center gap-4 cursor-pointer group`;
+                row.className = `song-row glass rounded-3xl p-5 flex items-center gap-5 cursor-pointer group`;
                 row.innerHTML = `
-                    <img src="${song.image}" class="w-14 h-14 object-cover rounded-xl" loading="lazy">
+                    <img src="${song.image}" class="w-16 h-16 rounded-2xl object-cover shadow-lg" loading="lazy">
                     <div class="flex-1 min-w-0">
-                        <p class="font-medium text-white truncate">${song.name}</p>
-                        <p class="text-sm text-gray-400 truncate">${song.artist}</p>
+                        <p class="font-semibold text-lg text-white truncate">${song.name}</p>
+                        <p class="text-purple-300 truncate">${song.artist}</p>
+                        <div class="flex items-center gap-4 text-xs text-gray-400 mt-2">
+                            <span>${durationStr}</span>
+                            ${song.year ? `<span>${song.year}</span>` : ''}
+                            ${song.playCount ? `<span class="flex items-center gap-1"><span class="iconify" data-icon="mdi:play-circle"></span>${(song.playCount/1000000).toFixed(1)}M</span>` : ''}
+                        </div>
                     </div>
-                    <button class="w-10 h-10 bg-white/10 hover:bg-purple-500 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                        <span class="iconify text-2xl text-white" data-icon="mdi:play"></span>
-                    </button>
+                    <div class="opacity-0 group-hover:opacity-100 transition-all">
+                        <button class="w-12 h-12 bg-purple-600 hover:bg-purple-500 rounded-2xl flex items-center justify-center">
+                            <span class="iconify text-3xl" data-icon="mdi:play"></span>
+                        </button>
+                    </div>
                 `;
                 row.addEventListener('click', () => loadSong(i));
-                results.appendChild(row);
+                container.appendChild(row);
             });
         }
 
         function loadSong(index) {
-            if (index < 0 || index >= songs.length) return;
             currentIndex = index;
             const song = songs[index];
+            if (!song) return;
 
-            audioPlayer.src = song.url;
-            audioPlayer.play().catch(() => {});
+            const audio = document.getElementById('audioPlayer');
+            audio.src = song.url;
+            audio.play();
 
-            // Update player UI
+            // Update Player
             document.getElementById('current-song-image').src = song.image;
             document.getElementById('current-song-title').textContent = song.name;
             document.getElementById('current-song-artist').textContent = song.artist;
+            
+            const info = [];
+            if (song.year) info.push(song.year);
+            if (song.duration) info.push(`${Math.floor(song.duration/60)}:${(song.duration%60).toString().padStart(2,'0')}`);
+            document.getElementById('current-song-info').textContent = info.join(' • ');
         }
 
-        // Audio Controls
-        audioPlayer.addEventListener('play', () => {
+        // Audio Event Listeners
+        const audio = document.getElementById('audioPlayer');
+        audio.addEventListener('timeupdate', () => {
+            const pct = (audio.currentTime / audio.duration) * 100 || 0;
+            document.getElementById('progress').style.width = pct + '%';
+            document.getElementById('current-time').textContent = formatTime(audio.currentTime);
+            document.getElementById('total-duration').textContent = formatTime(audio.duration);
+        });
+
+        audio.addEventListener('play', () => {
             isPlaying = true;
-            document.getElementById('play-pause-btn').innerHTML = `<span class="iconify text-4xl" data-icon="mdi:pause"></span>`;
+            document.getElementById('play-pause-btn').innerHTML = `<span class="iconify text-5xl" data-icon="mdi:pause"></span>`;
         });
 
-        audioPlayer.addEventListener('pause', () => {
+        audio.addEventListener('pause', () => {
             isPlaying = false;
-            document.getElementById('play-pause-btn').innerHTML = `<span class="iconify text-4xl" data-icon="mdi:play"></span>`;
+            document.getElementById('play-pause-btn').innerHTML = `<span class="iconify text-5xl" data-icon="mdi:play"></span>`;
         });
 
-        audioPlayer.addEventListener('timeupdate', () => {
-            const current = audioPlayer.currentTime;
-            const duration = audioPlayer.duration || 0;
-            document.getElementById('current-time').textContent = formatTime(current);
-            document.getElementById('duration').textContent = formatTime(duration);
-            document.getElementById('progress').style.width = `${(current / duration) * 100 || 0}%`;
-        });
-
-        audioPlayer.addEventListener('ended', () => {
-            if (currentIndex < songs.length - 1) loadSong(currentIndex + 1);
-        });
-
-        // Player Buttons
+        // Controls
         document.getElementById('play-pause-btn').addEventListener('click', () => {
-            if (isPlaying) audioPlayer.pause();
-            else audioPlayer.play();
+            isPlaying ? audio.pause() : audio.play();
         });
 
         document.getElementById('prev-btn').addEventListener('click', () => {
@@ -275,40 +265,29 @@
             if (currentIndex < songs.length - 1) loadSong(currentIndex + 1);
         });
 
-        function formatTime(seconds) {
-            if (!seconds || isNaN(seconds)) return "0:00";
-            const min = Math.floor(seconds / 60);
-            const sec = Math.floor(seconds % 60);
-            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        function formatTime(secs) {
+            if (!secs || isNaN(secs)) return "0:00";
+            const m = Math.floor(secs / 60);
+            const s = Math.floor(secs % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
         }
 
-        // Search Handlers
-        searchForm.addEventListener('submit', e => {
+        // Search
+        document.getElementById('searchForm').addEventListener('submit', e => {
             e.preventDefault();
-            const query = searchInput.value.trim();
-            if (query) searchSongs(query);
+            const q = document.getElementById('searchInput').value.trim();
+            if (q) searchSongs(q);
         });
 
-        searchInput.addEventListener('input', debounce((e) => {
-            const query = e.target.value.trim();
-            if (query.length > 2) searchSongs(query);
-        }, 400));
-
-        function debounce(func, delay) {
-            let timeout;
-            return (...args) => {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func(...args), delay);
-            };
-        }
-
-        // Load from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const initialQuery = urlParams.get('search');
-        if (initialQuery) {
-            searchInput.value = initialQuery;
-            searchSongs(initialQuery);
-        }
+        // Debounced live search
+        let timeout;
+        document.getElementById('searchInput').addEventListener('input', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                const q = document.getElementById('searchInput').value.trim();
+                if (q.length > 2) searchSongs(q);
+            }, 450);
+        });
     </script>
 </body>
 </html>
