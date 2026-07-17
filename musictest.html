@@ -128,7 +128,7 @@
         async function searchSongs(query) {
             results.innerHTML = '<div class="loader"></div>';
             try {
-                const res = await fetch(`https://saavn.sumit.co/search/songs?query=${encodeURIComponent(query)}`);
+                const res = await fetch(`https://saavn.sumit.co/api/search/songs?query=${encodeURIComponent(query)}`);
                 const data = await res.json();
                 if (data.status === 'SUCCESS' && data.data.results.length > 0) {
                     songs = data.data.results.map(song => ({
